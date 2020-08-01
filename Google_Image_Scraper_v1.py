@@ -27,19 +27,19 @@ def get_num():
     print("Please enter the number of images you want from all of the searches (num>=1)")
     while(True):
         num = input("Enter your number: ")
-        if(num >= 1):
-            return num
+        if(int(num) >= 1):
+            return int(num)
         else:
             continue
 
 
 
-def get_URLs(query_list, num_images, driver, directory):
+def get_URLs(query_list, num_images, driver):
 
     driver.get("https://www.google.com/imghp?hl=en&tab=wi&authuser=0&ogbl")
     for query in query_list:
         url = []
-        print("Getting images under: " + query_list[num])
+        print("Getting images under: " + query)
         print()
 
         #Preform search query 
@@ -63,17 +63,20 @@ def get_URLs(query_list, num_images, driver, directory):
             url.append(image[num].get_attribute('src'))
         
         #Retrieve images from URL list for the Query 
-        retrieve_Images(url, query, directory)
+        retrieve_Images(url, query)
+        image.clear()
+        url.clear()
+        driver.find_element_by_name('q').clear()
 
 
-def retrieve_Images(url, query, directory):
+def retrieve_Images(url, query):
     
     counter = 0
     #Iterate through URL list to pull out images
     for num in range(len(url)):
         #Case 1: Image stored in base64
         try:
-            print(url[num])
+            #print(url[num])
             url_string = url[num].split(',')[1]
             
             #print(url_string)
@@ -111,7 +114,7 @@ def retrieve_Images(url, query, directory):
     print()
     
 
-def save_Images(img, file_name, directory, base_64_bin):
+def save_Images(img, file_name, base_64_bin):
     if base_64_bin == 1:
        with open(file_name, "wb") as fh:
             fh.write(base64.b64decode(img))
@@ -137,7 +140,7 @@ if __name__ == '__main__':
     directory = ""
 
     #Begin process of getting Images
-    get_URLs(query_list, num_images, driver, directory)
+    get_URLs(query_list, num_images, driver)
     
 
     driver.quit()
