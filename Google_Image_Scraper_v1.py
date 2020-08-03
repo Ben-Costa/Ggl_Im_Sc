@@ -1,7 +1,7 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.keys import Keys
-from selenium import webdriver #web driver is driving
+from selenium import webdriver 
 import time
 from PIL import Image
 import requests
@@ -9,7 +9,6 @@ import io
 import base64
 import string
 import os
-import io
 
 def get_queueries():
     print("Please enter your Google Image Search Query (Lim 250 character). Enter 'TERMINATE' when done.")
