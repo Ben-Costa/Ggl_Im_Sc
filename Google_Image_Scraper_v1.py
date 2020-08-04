@@ -11,6 +11,7 @@ import string
 import os
 
 def get_queueries():
+
     print("Please enter your Google Image Search Query (Lim 250 character). Enter 'TERMINATE' when done.")
     print("")
     query_list = []
@@ -23,6 +24,7 @@ def get_queueries():
             query_list.append(query)
 
 def get_num():
+
     print("Please enter the number of images you want from all of the searches (num>=1)")
     while(True):
         num = input("Enter your number: ")
@@ -30,6 +32,14 @@ def get_num():
             return int(num)
         else:
             continue
+
+def get_dicrectory():
+
+    print("Please enter where you would like to store the images. Each query will be given its own file. Press [enter] to place in the working directory")
+    print()
+    directory = input("Enter your directory: ")
+    return directory
+
 
 
 
@@ -67,7 +77,6 @@ def get_URLs(query_list, num_images, driver):
         url.clear()
         driver.find_element_by_name('q').clear()
 
-
 def retrieve_Images(url, query):
     
     counter = 0
@@ -83,8 +92,7 @@ def retrieve_Images(url, query):
             #save_Images(url_string, file_name, directory, 1)
             with open(file_name, "wb") as fh:
                 fh.write(base64.b64decode(url_string))
-            print(file_name)
-        
+            print(file_name)  
         except:
             print("Error:" + query + " " + str(num) + " not stored in Base64 formatting. Attepmting to pull a request for the image.")
             #Case 2: Image does not exist in base64. Request the image from the webpage. 
@@ -112,8 +120,8 @@ def retrieve_Images(url, query):
     print("Saved " + str(counter) + " " + query + " Images")
     print()
     
-
 def save_Images(img, file_name, base_64_bin):
+    
     if base_64_bin == 1:
        with open(file_name, "wb") as fh:
             fh.write(base64.b64decode(img))
@@ -122,24 +130,20 @@ def save_Images(img, file_name, base_64_bin):
         with open(file_name, "wb") as fh:
             fh.write(img.content)
         #print(file_name)
-
-                   
+                  
 if __name__ == '__main__':
-    PATH = '/mnt/c/Users/bc234/Coding_Repo/Web_Scrape/chromedriver.exe'
+    PATH = ''#place path chrome_driver.exe here in your/path/here format
     
     driver = webdriver.Chrome(PATH)
-
-    
+   
     print("Welcome to the Not a Virus Google Image Scraper. Remember to run this program with Administrator privalleges.")
 
     #Get needed information 
     query_list = get_queueries()
     num_images = get_num()
-    #print("Please enter the directory you would like to add the pictures. Use the formate: ")
-    directory = ""
+    directory = get_dicrectory()
 
     #Begin process of getting Images
     get_URLs(query_list, num_images, driver)
     
-
     driver.quit()
