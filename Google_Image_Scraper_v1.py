@@ -142,11 +142,11 @@ def save_Images(img, file_name, directory, base_64_bin, query):
                 fh.write(img.content)
 
 if __name__ == '__main__':
-    PATH = '/mnt/c/Users/bc234/Coding_Repo/Web_Scrape/chromedriver.exe'#place path chrome_driver.exe here in your/path/here format
+    PATH = ''#place path chrome_driver.exe here in your/path/here format
     
     driver = webdriver.Chrome(PATH)
    
-    print("Welcome to the Not a Virus Google Image Scraper. Remember to run this program with Administrator privalleges.")
+    print("Welcome to the Google Image Scraper. Remember to have the correct version of the Chrome driver downloaed.")
 
     #Get needed information 
     query_list = get_queueries()
