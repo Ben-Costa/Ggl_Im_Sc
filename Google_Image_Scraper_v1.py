@@ -9,16 +9,18 @@ import io
 import base64
 import string
 import os
+from tqdm import tqdm
+
 
 def get_queueries():
 
-    print("Please enter your Google Image Search Query (Lim 250 character). Enter 'TERMINATE' when done.")
+    print("Please enter your Google Image Search Query (Lim 250 character). Press [Enter] when done.")
     print("")
     query_list = []
     while(True):
         query = input("Enter your query: ")
         print("")
-        if query == "TERMINATE":
+        if query == "":
             return query_list
         else:
             query_list.append(query)
@@ -42,13 +44,13 @@ def get_dicrectory():
 
 def get_URLs(query_list, num_images, driver, directory):
 
-    driver.get("https://www.google.com/imghp?hl=en&tab=wi&authuser=0&ogbl")
     for query in query_list:
         url = []
         print("Getting images under: " + query)
         print()
 
         # Preform search query 
+        driver.get("https://www.google.com/imghp?hl=en&tab=wi&authuser=0&ogbl")
         search = driver.find_element_by_name('q')
         search.send_keys(query)
         search.send_keys(Keys.RETURN)
@@ -56,13 +58,13 @@ def get_URLs(query_list, num_images, driver, directory):
 
         # Ensure proper number of images are loaded
         image = driver.find_elements_by_css_selector("img.Q4LuWd") 
-        print("Found " + str(len(image)) + "Images")
+        print("Found " + str(len(image)) + " Images")
         time.sleep(5)
         while len(image) < num_images:
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             image = driver.find_elements_by_css_selector("img.Q4LuWd")
             time.sleep(5)
-            print("Found " + str(len(image)) + "Images")
+            print("Found " + str(len(image)) + " Images")
 
         # Add Image URL's to url list 
         for num in range(num_images):   
@@ -72,32 +74,34 @@ def get_URLs(query_list, num_images, driver, directory):
         retrieve_Images(url, query, directory)
         image.clear()
         url.clear()
-        driver.find_element_by_name('q').clear()
         time.sleep(5)
 
 def retrieve_Images(url, query, directory):
     
     counter = 0
+    null_counter = 0
     # Iterate through URL list to pull out images
-    for num in range(len(url)):
+    print("Downloading imaged under " + query + " " + str(len(url)))
+    for num in tqdm(range(len(url))):
         # Case 1: Image stored in base64
         try:
             url_string = url[num].split(',')[1]
-            file_name = query + "_" + str(counter) + '.png'
+            file_name = query + "_" + str(counter + 1) + '.png'
             save_Images(url_string, file_name, directory, 1, query) 
         except:
-            print("Error:" + query + " " + str(num) + " not stored in Base64 formatting. Attepmting to pull a request for the image.")
+            #print("Error:" + query + " " + str(num) + " not stored in Base64 formatting. Attepmting to pull a request for the image.")
             # Case 2: Image does not exist in base64. Request the image from the webpage. 
             try: 
                 driver.get(url[num])
                 image = driver.find_element_by_tag_name('img')
                 src = image.get_attribute('src')
-                file_name = query + "_" + str(counter) + '.png'
+                file_name = query + "_" + str(counter + 1) + '.png'
                 img = requests.get(src)
                 save_Images(img, file_name, directory, 0, query)
             except:
                 #Handling case of if image URL returned as Null
                 if url[num] is None:
+                    null_counter += 1
                     continue
                 # Handling case if image URL request failed
                 else:
@@ -106,6 +110,7 @@ def retrieve_Images(url, query, directory):
         time.sleep(0.5) # Rest period time. Can be changed to speed up process. 
         counter += 1
     print("Saved " + str(counter) + " " + query + " Images")
+    print(str(null_counter) + " null images")
     print()
     
 def save_Images(img, file_name, directory, base_64_bin, query):
